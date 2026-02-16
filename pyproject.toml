@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comb-db"
+version = "0.1.0"
+description = "Honeycomb-structured lossless context archival for AI agents"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    {name = "Ava Shakil", email = "ava@artifactvirtual.com"},
+]
+keywords = ["ai", "memory", "context", "archival", "agents", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+cli = ["click>=8.0"]
+
+[project.scripts]
+comb = "comb.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/amuzetnoM/comb"
+Repository = "https://github.com/amuzetnoM/comb"
+Issues = "https://github.com/amuzetnoM/comb/issues"
+
+[tool.setuptools.packages.find]
+include = ["comb*"]

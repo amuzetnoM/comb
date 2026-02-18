@@ -1,21 +1,39 @@
-```
+<p align="center">
+  <pre align="center">
      _____ _____ _____ _____
     / ____/ ___ / _  \/ _  \     COMB
    / /   / / / / / / / /_/ /     Chain-Ordered Memory Base
   / /___/ /_/ / / / / ___ /
   \____/\___/_/ /_/_/   \_\      Lossless context archival
                                   for AI agents.
-```
+  </pre>
+</p>
 
-# COMB
+<p align="center">
+  <em>Your AI doesn't need a better summary. It needs a better memory.</em>
+</p>
 
-**Your AI doesn't need a better summary. It needs a better memory.**
+<p align="center">
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#the-honeycomb">The Honeycomb</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#cli">CLI</a> •
+  <a href="#custom-search-backend">Custom Search</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.10+-3776AB?logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/dependencies-zero-brightgreen" alt="Zero deps"/>
+  <img src="https://img.shields.io/badge/storage-JSON-orange" alt="JSON"/>
+  <img src="https://img.shields.io/badge/chain-hash--linked-blueviolet" alt="Hash-linked"/>
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"/>
+</p>
+
+---
 
 COMB is a honeycomb-structured, lossless context archival system for AI agents. Instead of summarizing conversations (lossy), COMB archives the full text as documents in a three-directional graph.
 
 Zero dependencies. Pure Python. Single directory storage. Copy the folder, copy the memory.
-
----
 
 ## Why not just summarize?
 
@@ -23,11 +41,13 @@ Every AI memory system today works the same way: conversations get summarized, c
 
 COMB takes a different approach: **keep everything**.
 
-- **Lossless** — full conversation text, always recoverable
-- **Hash-chained** — tamper-evident, like a blockchain for conversations
-- **Three-directional links** — navigate by time, by meaning, or by relationship
-- **Schema-on-read** — your data, your interpretation
-- **Serverless** — no database, no server, just files in a directory
+| | Principle | |
+|---|---|---|
+| 🔒 | **Lossless** | Full conversation text, always recoverable |
+| ⛓️ | **Hash-chained** | Tamper-evident, like a blockchain for conversations |
+| 🐝 | **Three-directional links** | Navigate by time, by meaning, or by relationship |
+| 📐 | **Schema-on-read** | Your data, your interpretation |
+| 📁 | **Serverless** | No database, no server, just files in a directory |
 
 ## Architecture
 
@@ -48,12 +68,18 @@ COMB takes a different approach: **keep everything**.
     │   Chain Archive      │   Hash-chained
     │                      │   Honeycomb-linked
     └──────────────────────┘
+```
 
-         The Honeycomb:
-
-         TEMPORAL ←──→  chronological chain (prev/next)
-         SEMANTIC ←──→  content similarity links
-         SOCIAL   ←──→  relationship gradient links
+```
+comb/
+├── core.py          # CombStore — the main interface
+├── staging.py       # DailyStaging — append-only JSONL staging
+├── archive.py       # ChainArchive — hash-chained document store
+├── document.py      # CombDocument — temporal, semantic, social links
+├── honeycomb.py     # HoneycombGraph — three-directional link computation
+├── search.py        # BM25Search — zero-dependency full-text search
+├── cli.py           # Click CLI — stage, rollup, search, show, verify, stats
+└── _utils.py        # Hashing, date helpers
 ```
 
 ## Quick Start
@@ -92,6 +118,30 @@ doc.social.cooled          # cooling relationships
 assert store.verify_chain()  # no tampering
 ```
 
+## The Honeycomb
+
+Every archived document lives in a three-directional graph:
+
+```
+         TEMPORAL ←──→  chronological chain (prev/next hash-linked)
+         SEMANTIC ←──→  content similarity (BM25 cosine, top-k neighbors)
+         SOCIAL   ←──→  relationship gradient (warming ↔ cooling)
+```
+
+### ⛓️ Temporal Links
+A chronological chain. Each document points to the previous and next day. Hash-linked — if any document is tampered with, the chain breaks. Blockchain-grade integrity for conversation history.
+
+### 🧠 Semantic Links
+Computed via term-frequency cosine similarity (built-in, zero dependencies). The top-k most similar documents are linked automatically during rollup. Plug in your own search backend for better results.
+
+### 💛 Social Links
+The novel part. Conversations have *relational temperature*. COMB tracks:
+
+- **Inward fade** (strengthening) — engagement is increasing, sentiment is warming
+- **Outward fade** (cooling) — engagement is decreasing, sentiment is cooling
+
+This lets an agent understand not just *what* was discussed, but *how the relationship evolved*.
+
 ## CLI
 
 ```bash
@@ -110,7 +160,7 @@ comb -s ./my-memory search "encryption"
 # Show a document
 comb -s ./my-memory show 2026-02-17
 
-# Verify chain
+# Verify chain integrity
 comb -s ./my-memory verify
 
 # Stats
@@ -119,24 +169,6 @@ comb -s ./my-memory stats
 
 Requires `pip install comb-db[cli]`.
 
-## The Honeycomb
-
-Every archived document has three types of links:
-
-### Temporal Links
-A chronological chain. Each document points to the previous and next day. Hash-linked — if any document is tampered with, the chain breaks.
-
-### Semantic Links
-Computed via term-frequency cosine similarity (built-in, no dependencies). The top-k most similar documents are linked automatically during rollup. Plug in your own search backend for better results.
-
-### Social Links
-The novel part. Conversations have *relational temperature*. COMB tracks:
-
-- **Inward fade** (strengthening) — engagement is increasing, sentiment is warming
-- **Outward fade** (cooling) — engagement is decreasing, sentiment is cooling
-
-This lets an agent understand not just *what* was discussed, but *how the relationship evolved*.
-
 ## Custom Search Backend
 
 The built-in BM25 is good enough for hundreds of documents. For scale, implement the `SearchBackend` protocol:
@@ -144,30 +176,14 @@ The built-in BM25 is good enough for hundreds of documents. For scale, implement
 ```python
 from comb import SearchBackend
 
-class MyBackend:
+class MyVectorBackend:
     def index(self, doc_id: str, text: str) -> None:
         ...
     def search(self, query: str, k: int = 5) -> list[tuple[str, float]]:
         ...
 
-store = CombStore("./memory", search_backend=MyBackend())
+store = CombStore("./memory", search_backend=MyVectorBackend())
 ```
-
-## What COMB Is
-
-- A file-based archival system for conversation history
-- A tamper-evident chain of daily conversation documents
-- A three-directional graph for navigating memory
-- A library with zero required dependencies
-- Portable (copy the directory, copy the memory)
-
-## What COMB Is Not
-
-- Not a vector database
-- Not a summarization tool
-- Not a real-time retrieval system
-- Not a replacement for your agent's context window
-- Not magic — it's just well-organized files
 
 ## Storage Format
 
@@ -183,20 +199,36 @@ my-memory/
     └── 2026-02-17.json
 ```
 
+## What COMB Is — and Isn't
+
+**Is:**
+- A file-based archival system for conversation history
+- A tamper-evident chain of daily conversation documents
+- A three-directional graph for navigating memory
+- A zero-dependency library. Portable. Copy the directory, copy the memory.
+
+**Isn't:**
+- Not a vector database
+- Not a summarization tool
+- Not a real-time retrieval system
+- Not a replacement for your agent's context window
+
+## Lineage
+
+COMB descends from HYBRIDbee, a serverless document database. It inherits the philosophy: schema-on-read, single-directory storage, zero configuration.
+
 ## Requirements
 
 - Python 3.10+
 - Zero dependencies (stdlib only)
 - Optional: `click` for CLI
 
-## Lineage
-
-COMB descends from HYBRIDbee, a serverless document database. It inherits the philosophy: schema-on-read, single-directory storage, zero configuration.
-
 ## License
 
 MIT
 
-## Author
+---
 
-Ava Shakil — [Artifact Virtual](https://artifactvirtual.com)
+<p align="center">
+  <em>Built by <a href="https://github.com/amuzetnoM">Ava Shakil</a> at <a href="https://github.com/Artifact-Virtual">Artifact Virtual</a></em>
+</p>

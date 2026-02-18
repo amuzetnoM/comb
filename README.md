@@ -22,7 +22,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/python-3.10+-3776AB?logo=python&logoColor=white" alt="Python"/>
+  <a href="https://pypi.org/project/comb-db/"><img src="https://img.shields.io/pypi/v/comb-db?color=blue&logo=pypi&logoColor=white" alt="PyPI"/></a>
+  <a href="https://pypi.org/project/comb-db/"><img src="https://img.shields.io/pypi/pyversions/comb-db?logo=python&logoColor=white" alt="Python versions"/></a>
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen" alt="Zero deps"/>
   <img src="https://img.shields.io/badge/storage-JSON-orange" alt="JSON"/>
   <img src="https://img.shields.io/badge/chain-hash--linked-blueviolet" alt="Hash-linked"/>

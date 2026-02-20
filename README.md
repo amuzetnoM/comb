@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <strong>Three lines of code. Any agent, any framework.</strong>
+  <strong>Three lines to remember everything. Zero dependencies.</strong>
 </p>
 
 <p align="center">

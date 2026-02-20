@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <strong>三行代码。任何代理，任何框架。</strong>
+  <strong>三行代码记住一切。零依赖。</strong>
 </p>
 
 <p align="center">

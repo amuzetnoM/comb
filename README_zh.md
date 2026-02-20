@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <em>你的 AI 不需要更好的摘要。它需要更好的记忆。</em>
+  <em>20万token的上下文窗口什么都有，但什么都找不到。<br/>COMB什么都有，而且能找到重要的。</em>
 </p>
 
 <p align="center">

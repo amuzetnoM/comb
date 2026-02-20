@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <em>Your AI doesn't need a better summary. It needs a better memory.</em>
+  <em>A 200K context window has everything but finds nothing.<br/>COMB has everything and finds what matters.</em>
 </p>
 
 <p align="center">

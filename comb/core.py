@@ -229,8 +229,74 @@ class CombStore:
                     queue.append(neighbor.target)
 
     # ------------------------------------------------------------------
-    # Chain integrity
+    # Blink: Seamless Agent Restart
     # ------------------------------------------------------------------
+
+    def recall(
+        self,
+        *,
+        k: int = 5,
+        include_staged: bool = True,
+    ) -> str:
+        """Reconstruct operational context for an agent waking up.
+
+        Gathers the most recent archived documents and any staged-but-not-
+        yet-rolled-up entries to produce a text block an agent can ingest
+        to resume where it left off.  This is the "wake up" half of the
+        blink pattern.
+
+        Args:
+            k: Number of most recent archived documents to include.
+            include_staged: Whether to include today's staged entries.
+
+        Returns:
+            Concatenated recall text, most recent first.
+        """
+        parts: list[str] = []
+
+        # Include un-rolled staged entries (most recent operational context)
+        if include_staged:
+            for date in sorted(self._staging.dates(), reverse=True):
+                entries = self._staging.read(date)
+                for entry in reversed(entries):
+                    parts.append(f"[staged {entry['timestamp']}]\n{entry['text']}")
+
+        # Include most recent archived documents
+        dates = sorted(self._archive.dates(), reverse=True)[:k]
+        for date in dates:
+            doc = self._archive.get(date)
+            if doc:
+                parts.append(f"[archive {doc.date}]\n{doc.content}")
+
+        return "\n\n---\n\n".join(parts) if parts else "(empty memory)"
+
+    def blink(
+        self,
+        text: str,
+        *,
+        metadata: Optional[dict[str, Any]] = None,
+        rollup: bool = False,
+    ) -> str:
+        """Stage a memory flush and prepare for agent restart.
+
+        The "blink" pattern: stage operational context → optionally roll up
+        → return recall text for the next wake-up.  The agent calls this
+        just before its process restarts.
+
+        Args:
+            text: Operational context to stage (everything the agent needs
+                to remember across the restart).
+            metadata: Arbitrary metadata to attach.
+            rollup: If ``True``, also roll up today's staged data into the
+                archive before returning.
+
+        Returns:
+            Recall text that can be fed to the agent on wake-up.
+        """
+        self.stage(text, metadata={**(metadata or {}), "blink": True})
+        if rollup:
+            self.rollup()
+        return self.recall()
 
     def verify_chain(self) -> bool:
         """Verify the integrity of the hash chain.

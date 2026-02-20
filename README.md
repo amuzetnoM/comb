@@ -158,6 +158,12 @@ comb -s ./my-memory rollup
 # Search
 comb -s ./my-memory search "encryption"
 
+# Blink (pre-restart flush)
+echo "operational context..." | comb -s ./my-memory blink
+
+# Recall (post-restart wake-up)
+comb -s ./my-memory recall
+
 # Show a document
 comb -s ./my-memory show 2026-02-17
 
@@ -169,6 +175,24 @@ comb -s ./my-memory stats
 ```
 
 Requires `pip install comb-db[cli]`.
+
+## The Blink Pattern
+
+Seamless agent restarts with zero context loss. Flush before the wall, recall after the restart.
+
+```python
+# Before restart — save everything
+store.blink("""
+Active project: step 3500/100K, loss 4.85
+Decision: deferred publish until 80% milestone
+""")
+
+# After restart — get it all back
+context = store.recall()
+# → staged entries (most recent) + archived history
+```
+
+The agent doesn't die and resurrect. It **blinks**. See [docs/blink.md](docs/blink.md) for the full pattern.
 
 ## Custom Search Backend
 

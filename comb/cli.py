@@ -113,6 +113,39 @@ def verify(ctx: click.Context) -> None:
         raise SystemExit(1)
 
 
+@cli.command()
+@click.option("-k", default=5, help="Number of recent documents to recall.")
+@click.option("--no-staged", is_flag=True, help="Exclude un-rolled staged entries.")
+@click.pass_context
+def recall(ctx: click.Context, k: int, no_staged: bool) -> None:
+    """Reconstruct operational context (wake-up half of blink)."""
+    text = ctx.obj["store"].recall(k=k, include_staged=not no_staged)
+    click.echo(text)
+
+
+@cli.command()
+@click.argument("text", required=False)
+@click.option("--file", "-f", type=click.Path(exists=True), help="Read text from file.")
+@click.option("--rollup", "-r", is_flag=True, help="Also roll up into archive.")
+@click.pass_context
+def blink(ctx: click.Context, text: str | None, file: str | None, rollup: bool) -> None:
+    """Stage a memory flush for seamless agent restart.
+
+    The blink pattern: flush context → restart → recall → resume.
+    Call this before restarting your agent. On wake-up, call `recall`.
+    """
+    if file:
+        text = Path(file).read_text("utf-8")
+    if not text:
+        text = click.get_text_stream("stdin").read()
+    if not text.strip():
+        click.echo("Nothing to blink.", err=True)
+        return
+    recall_text = ctx.obj["store"].blink(text, rollup=rollup)
+    click.echo(f"Blinked {len(text)} bytes. Recall preview:")
+    click.echo(recall_text[:500] + ("..." if len(recall_text) > 500 else ""))
+
+
 def main() -> None:
     """Entry point for the CLI."""
     cli()

@@ -13,6 +13,10 @@
 </p>
 
 <p align="center">
+  <strong>三行代码。任何代理，任何框架。</strong>
+</p>
+
+<p align="center">
   <a href="#快速开始">快速开始</a> •
   <a href="#蜂巢结构">蜂巢结构</a> •
   <a href="#架构">架构</a> •

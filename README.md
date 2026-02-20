@@ -14,6 +14,10 @@
 </p>
 
 <p align="center">
+  <strong>Three lines of code. Any agent, any framework.</strong>
+</p>
+
+<p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#the-honeycomb">The Honeycomb</a> •
   <a href="#architecture">Architecture</a> •
